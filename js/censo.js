@@ -230,7 +230,7 @@ window.saveCenso = async () => {
     ['A','B','C'].forEach(x=>document.getElementById('t'+x).className='tipo-btn');
     document.getElementById('gps-status').textContent = 'Sin ubicación registrada';
     document.getElementById('gps-status').style.color = '';
-    fbEl('c-fb','✅ Cliente registrado y state.censo guardado','var(--gl)','var(--g)');
+    fbEl('c-fb','✅ Cliente registrado y censo guardado','var(--gl)','var(--g)');
   } catch(e) {
     fbEl('c-fb','❌ Error al guardar: ' + e.message,'var(--rl)','var(--r)');
   }

@@ -66,7 +66,7 @@ function updDia(){
     if(pedidosHoy.length){
       r+=`\n\nDETALLE PEDIDOS:\n`;
       pedidosHoy.forEach(p=>{
-        r+=`• ${p.cliente_nombre} - Total: $${p.total.toFixed(2)} ${p.state.moneda}\n`;
+        r+=`• ${p.cliente_nombre} - Total: $${p.total.toFixed(2)} ${p.moneda}\n`;
       });
     }
     
