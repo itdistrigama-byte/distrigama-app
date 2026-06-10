@@ -1,5 +1,5 @@
-const CACHE = 'distrigama-v2';
-const OFFLINE_ASSETS = ['/', '/index.html', '/manifest.json'];
+const CACHE = 'distrigama-v3';
+const OFFLINE_ASSETS = ['/', '/index.html', '/manifest.json', '/data-catalog.js'];
 
 self.addEventListener('install', e => {
   e.waitUntil(
