@@ -358,38 +358,25 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
     <div class="fld"><label>Actividad principal</label>
       <div class="chk-grid">
         <div class="chk" onclick="tgLinea(this,'Cerrajería')">🔑 Cerrajería</div>
-        <div class="chk" onclick="tgLinea(this,'Construcción')">🏗️ Construcción</div>
         <div class="chk" onclick="tgLinea(this,'Electricidad')">⚡ Electricidad</div>
-        <div class="chk" onclick="tgLinea(this,'Fabricantes')">🏭 Fabricantes</div>
+        <div class="chk" onclick="tgLinea(this,'Plomería')">🚿 Plomería</div>
         <div class="chk" onclick="tgLinea(this,'Ferretería General')">🔩 Ferretería General</div>
         <div class="chk" onclick="tgLinea(this,'Herrería')">⚒️ Herrería</div>
+        <div class="chk" onclick="tgLinea(this,'Fabricantes')">🏭 Fabricantes</div>
         <div class="chk" onclick="tgLinea(this,'Maderera')">🪵 Maderera</div>
-        <div class="chk" onclick="tgLinea(this,'Plomería')">🚿 Plomería</div>
         <div class="chk" onclick="tgLinea(this,'Revestimiento')">🪟 Revestimiento</div>
+        <div class="chk" onclick="tgLinea(this,'Construcción')">🏗️ Construcción</div>
       </div>
     </div>
     <div class="fld"><label>Resultado de la visita</label>
       <select id="c-res">
-        <option value="">Seleccionar...</option>
-        <optgroup label="❌ No efectivo">
-          <option>No se encontró responsable</option>
-          <option>Contacto preliminar (WhatsApp/teléfono)</option>
-        </optgroup>
-        <optgroup label="⚠️ Parcialmente efectivo">
-          <option>Presentación inicial (catálogo)</option>
-          <option>Conversación de políticas (sin fecha)</option>
-        </optgroup>
-        <optgroup label="✅ Efectivo (sin cierre)">
-          <option>Visita preliminar completada (fecha acordada)</option>
-          <option>Proposición de pedido (en revisión)</option>
-        </optgroup>
-        <optgroup label="✅✅ Cierre">
-          <option>Pedido cerrado</option>
-        </optgroup>
-        <optgroup label="❌ Rechazos">
-          <option>No interesado (rechazo activo)</option>
-          <option>Competencia presente (cliente satisfecho)</option>
-        </optgroup>
+          <option value="">Seleccionar...</option>
+          <option value="Pedido cerrado">✅✅ Pedido cerrado</option>
+          <option value="Proposición de pedido (en revisión)">✅ Proposición de pedido</option>
+          <option value="Visita preliminar completada (fecha acordada)">✅ Visita preliminar (políticas + catálogo)</option>
+          <option value="Contacto preliminar (WhatsApp/teléfono)">📋 Toma de datos</option>
+          <option value="No se encontró responsable">❌ No se encontró responsable</option>
+          <option value="No interesado (rechazo activo)">❌ No interesado</option>
       </select>
     </div>
     <div class="fld"><label>Próxima visita</label>
@@ -472,30 +459,30 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
     </div>
     <!-- búsqueda + filtros -->
     <div style="padding:10px 16px 4px">
-      <div class="srch-w" style="margin-bottom:8px">
-        <span class="srch-ico">🔍</span>
-        <input type="text" id="c-srch" placeholder="Buscar por nombre o RIF..." oninput="renderCartera()" autocomplete="off">
+      <div class="srch2" style="margin-bottom:8px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8A8884" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 L20 20"/></svg>
+        <input type="text" id="c-srch" placeholder="Buscar en toda la base por nombre o RIF..." oninput="renderCartera()" autocomplete="off">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <select id="cart-orden" onchange="renderCartera()" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:13px">
+        <div class="flt"><label>Ordenar</label><select id="cart-orden" onchange="renderCartera()">
           <option value="dias">Ordenar: días sin visita</option>
           <option value="prox">Ordenar: próxima acción</option>
           <option value="nombre">Ordenar: nombre</option>
-        </select>
-        <select id="cart-ruta" onchange="renderCartera()" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:13px">
+        </select></div>
+        <div class="flt"><label>Ruta</label><select id="cart-ruta" onchange="renderCartera()">
           <option value="">Ruta: todas</option>
           <option>Ruta 1 · Catia</option><option>Ruta 2 · Centro</option><option>Ruta 3 · La Yaguara</option>
           <option>Ruta 4 · Eje Sur</option><option>Ruta 5 · Eje Financiero</option><option>Ruta 6 · Boleíta Industrial</option>
           <option>Ruta 7 · Petare / Mariche</option><option>Ruta 8 · Baruta / Hatillo</option>
           <option>Ruta 9 · Guarenas / Guatire</option><option>Ruta 10 · Altos Mirandinos</option>
-        </select>
-        <select id="cart-tipo" onchange="renderCartera()" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:13px">
+        </select></div>
+        <div class="flt"><label>Tipo</label><select id="cart-tipo" onchange="renderCartera()">
           <option value="">Tipo: A+B+C</option><option value="A">Tipo A</option><option value="B">Tipo B</option><option value="C">Tipo C</option>
-        </select>
-        <select id="cart-etapa" onchange="renderCartera()" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:13px">
+        </select></div>
+        <div class="flt"><label>Etapa</label><select id="cart-etapa" onchange="renderCartera()">
           <option value="">Etapa: todas</option><option value="prospecto">Prospecto</option><option value="contactado">Contactado</option>
           <option value="propuesta">Propuesta</option><option value="cliente_activo">Activo</option><option value="recompra">Recompra</option>
-        </select>
+        </select></div>
       </div>
     </div>
     <!-- client list -->
@@ -573,16 +560,13 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
       <div style="padding:12px 20px;border-top:1px solid var(--border)">
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Registrar seguimiento</div>
         <select id="fc-seg-res" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:14px;margin-bottom:8px">
-          <option value="">Resultado de la visita...</option>
-          <option>Pedido cerrado</option>
-          <option>Proposición de pedido (en revisión)</option>
-          <option>Visita preliminar completada (fecha acordada)</option>
-          <option>Conversación de políticas (sin fecha)</option>
-          <option>Presentación inicial (catálogo)</option>
-          <option>Contacto preliminar (WhatsApp/teléfono)</option>
-          <option>No se encontró responsable</option>
-          <option>No interesado (rechazo activo)</option>
-          <option>Competencia presente (cliente satisfecho)</option>
+          <option value="">Seleccionar...</option>
+          <option value="Pedido cerrado">✅✅ Pedido cerrado</option>
+          <option value="Proposición de pedido (en revisión)">✅ Proposición de pedido</option>
+          <option value="Visita preliminar completada (fecha acordada)">✅ Visita preliminar (políticas + catálogo)</option>
+          <option value="Contacto preliminar (WhatsApp/teléfono)">📋 Toma de datos</option>
+          <option value="No se encontró responsable">❌ No se encontró responsable</option>
+          <option value="No interesado (rechazo activo)">❌ No interesado</option>
         </select>
         <input id="fc-seg-obs" placeholder="Observación / próxima acción..." style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:14px;margin-bottom:8px" autocomplete="off">
         <div style="display:flex;gap:8px">
@@ -1195,6 +1179,16 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .ck-n{font-size:20px;font-weight:700;margin:2px 0 0}
 .cart-row{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer}
 .cart-act{background:none;border:1px solid var(--border);border-radius:8px;width:34px;height:34px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--text)}
+/* v6.3 — filtros con etiqueta + lupa fina + líneas 3 col */
+.chk-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.flt{position:relative;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:4px 8px 2px}
+.flt label{display:block;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.4px;margin:2px 0 0 4px;text-transform:uppercase}
+.flt select{width:100%;border:none;background:transparent;color:var(--text);font-size:13px;font-weight:600;padding:2px 4px 4px;appearance:none;-webkit-appearance:none;outline:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238A8884' stroke-width='2.5' stroke-linecap='round'><path d='M5 9 L12 16 L19 9'/></svg>");background-repeat:no-repeat;background-position:right 4px center}
+.srch2{position:relative}
+.srch2 input{width:100%;height:42px;border:1.5px solid var(--border);border-radius:12px;background:var(--card);color:var(--text);font-size:14px;padding:0 12px 0 36px;outline:none;transition:border-color .15s, box-shadow .15s}
+.srch2 input:focus{border-color:var(--g);box-shadow:0 0 0 3px var(--gl)}
+.srch2 svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none}
+.cli-ajeno{padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg)}
 </style>
 <script type="module">
 // ── DISTRIGAMA v5.9 · JS modularizado (jun 2026) ──
