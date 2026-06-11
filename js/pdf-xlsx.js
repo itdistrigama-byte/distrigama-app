@@ -234,10 +234,13 @@ window.savePedido = async () => {
           console.log('✅ Cliente creado desde pedido:', rifNorm);
         } else {
           // Update existing client pedido count
-          await updateDoc(doc(db, 'clientes', rifNorm), {
-            total_pedidos: (cSnap.data().total_pedidos || 0) + 1,
-            ultima_visita: serverTimestamp()
-          });
+          const cd = cSnap.data();
+          const nuevoTotal = (cd.total_pedidos || 0) + 1;
+          const RANK = { prospecto:0, contactado:1, propuesta:2, cliente_activo:3, recompra:4 };
+          const destino = nuevoTotal >= 2 ? 'recompra' : 'cliente_activo';
+          const updCli = { total_pedidos: nuevoTotal, ultima_visita: serverTimestamp() };
+          if (RANK[destino] > (RANK[cd.etapa] ?? 0)) updCli.etapa = destino;
+          await updateDoc(doc(db, 'clientes', rifNorm), updCli);
         }
       } catch(e) { console.error('Error auto-creating client:', e); }
     }
