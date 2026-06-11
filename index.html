@@ -444,10 +444,15 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
         <button class="chip" id="cf-contactado" onclick="setCFilter('contactado',this)">Contactado</button>
         <button class="chip" id="cf-propuesta" onclick="setCFilter('propuesta',this)">Propuesta</button>
         <button class="chip" id="cf-activo" onclick="setCFilter('cliente_activo',this)">Activo</button>
+        <span style="border-left:1px solid var(--border);margin:2px 2px"></span>
+        <button class="chip on" id="cft-todos" onclick="setCTipo('',this)">A+B+C</button>
+        <button class="chip" id="cft-A" onclick="setCTipo('A',this)">Tipo A</button>
+        <button class="chip" id="cft-B" onclick="setCTipo('B',this)">Tipo B</button>
+        <button class="chip" id="cft-C" onclick="setCTipo('C',this)">Tipo C</button>
       </div>
     </div>
     <!-- client list -->
-    <div id="c-list" style="padding:8px 0">
+    <div id="cart-list" style="padding:8px 0">
       <div style="padding:40px 20px;text-align:center;color:var(--muted);font-size:14px">
         <div style="font-size:40px;margin-bottom:12px;opacity:.4">👥</div>
         Cargando cartera...
@@ -464,7 +469,17 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
         <div>
           <div style="font-size:18px;font-weight:700;color:var(--text)" id="fc-nombre">—</div>
           <div style="font-size:12px;color:var(--muted);margin-top:2px" id="fc-rif">—</div>
-          <div id="fc-etapa-badge" style="display:inline-block;margin-top:6px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px">—</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+            <div id="fc-etapa-badge" style="display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px">—</div>
+            <span id="fc-tipo-badge"></span>
+          </div>
+          <select id="fc-etapa-sel" onchange="setEtapa(this.value)" style="margin-top:8px;padding:6px 8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:13px">
+            <option value="prospecto">Prospecto</option>
+            <option value="contactado">Contactado</option>
+            <option value="propuesta">Propuesta</option>
+            <option value="cliente_activo">Cliente activo</option>
+            <option value="recompra">Recompra</option>
+          </select>
         </div>
         <button onclick="closeFicha()" style="background:var(--bg);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:var(--muted)">×</button>
       </div>
@@ -494,10 +509,33 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:10px">Historial de visitas</div>
         <div id="fc-historial" style="font-size:13px;color:var(--muted);font-style:italic">Cargando...</div>
       </div>
+      <!-- registrar seguimiento -->
+      <div style="padding:12px 20px;border-top:1px solid var(--border)">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Registrar seguimiento</div>
+        <select id="fc-seg-res" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:14px;margin-bottom:8px">
+          <option value="">Resultado de la visita...</option>
+          <option>Pedido cerrado</option>
+          <option>Proposición de pedido (en revisión)</option>
+          <option>Visita preliminar completada (fecha acordada)</option>
+          <option>Conversación de políticas (sin fecha)</option>
+          <option>Presentación inicial (catálogo)</option>
+          <option>Contacto preliminar (WhatsApp/teléfono)</option>
+          <option>No se encontró responsable</option>
+          <option>No interesado (rechazo activo)</option>
+          <option>Competencia presente (cliente satisfecho)</option>
+        </select>
+        <input id="fc-seg-obs" placeholder="Observación / próxima acción..." style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:14px;margin-bottom:8px" autocomplete="off">
+        <div style="display:flex;gap:8px">
+          <input type="date" id="fc-seg-fecha" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:14px">
+          <input type="time" id="fc-seg-hora" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:14px">
+        </div>
+        <button class="btn btn-g" style="width:100%;margin-top:10px" onclick="saveSeguimiento()">Guardar seguimiento</button>
+        <div id="fc-seg-fb" style="display:none;margin-top:8px;padding:8px 12px;border-radius:8px;font-size:13px"></div>
+      </div>
       <!-- action buttons -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 20px">
         <button class="btn btn-out" onclick="closeFicha()">Cerrar</button>
-        <button class="btn btn-g" onclick="closeFicha()">+ Pedido</button>
+        <button class="btn btn-g" onclick="pedidoFromFicha()">+ Pedido</button>
       </div>
     </div>
   </div>
