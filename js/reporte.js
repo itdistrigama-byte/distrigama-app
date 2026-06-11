@@ -49,10 +49,10 @@ function updDia(){
     r+=`── RESULTADOS DE VISITA ──\n`;
     if(pedCerr)   r+=`✅✅ Pedido cerrado: ${pedCerr}\n`;
     if(propPed)   r+=`✅  Proposición de pedido (en revisión): ${propPed}\n`;
-    if(visAcor)   r+=`✅  Visita completada (fecha acordada): ${visAcor}\n`;
+    if(visAcor)   r+=`✅  Visita preliminar (políticas + catálogo): ${visAcor}\n`;
     if(convPol)   r+=`⚠️  Conversación de políticas (sin fecha): ${convPol}\n`;
     if(presCat)   r+=`⚠️  Presentación inicial (catálogo): ${presCat}\n`;
-    if(ctcPrel)   r+=`❌  Contacto preliminar (WhatsApp): ${ctcPrel}\n`;
+    if(ctcPrel)   r+=`📋  Toma de datos: ${ctcPrel}\n`;
     if(noResp)    r+=`❌  No se encontró responsable: ${noResp}\n`;
     if(noInt)     r+=`❌  No interesado (rechazo activo): ${noInt}\n`;
     if(compPres)  r+=`❌  Competencia presente: ${compPres}\n`;
