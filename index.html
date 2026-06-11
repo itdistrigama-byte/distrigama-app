@@ -432,23 +432,70 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 
   <!-- CARTERA DE CLIENTES -->
   <div class="scr" id="scr-cartera">
-    <!-- search + filters sticky bar -->
-    <div style="position:sticky;top:52px;background:var(--bg);z-index:10;padding:12px 16px 8px;border-bottom:1px solid var(--border)">
+    <!-- PANEL DE OPERACIÓN v6.2 -->
+    <div style="padding:12px 16px 0">
+      <div style="display:flex;gap:6px">
+        <button class="pnl-btn on" id="pb-hoy" onclick="showPanel('hoy',this)">☀️ Hoy</button>
+        <button class="pnl-btn" id="pb-analisis" onclick="showPanel('analisis',this)">📊 Análisis</button>
+        <button class="pnl-btn" id="pb-equipo" onclick="showPanel('equipo',this)" style="display:none">👥 Equipo</button>
+      </div>
+      <div id="pnl-body" style="touch-action:pan-y">
+        <div class="pnl-blk" id="pnl-hoy">
+          <div style="display:flex;align-items:center;gap:16px">
+            <svg width="84" height="84" viewBox="0 0 84 84"><circle cx="42" cy="42" r="34" fill="none" stroke="var(--border)" stroke-width="8"/><circle id="pnl-ring" cx="42" cy="42" r="34" fill="none" stroke="var(--g)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0 214" transform="rotate(-90 42 42)"/><text id="pnl-ring-txt" x="42" y="47" text-anchor="middle" font-size="16" font-weight="700" fill="var(--text)">—</text></svg>
+            <div>
+              <div style="font-size:12px;color:var(--muted)">Ventas de hoy</div>
+              <div style="font-size:22px;font-weight:700" id="pnl-ventas">$0.00</div>
+              <div style="font-size:12px;color:var(--muted)" id="pnl-sub">— pedidos · ticket —</div>
+            </div>
+          </div>
+        </div>
+        <div class="pnl-blk" id="pnl-analisis" style="display:none">
+          <div style="font-size:13px;font-weight:700;margin-bottom:8px">Embudo de la semana</div>
+          <div id="pnl-funnel" style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px"></div>
+          <div style="font-size:13px;font-weight:700;margin-bottom:4px" id="pnl-rec-t">Clientes del mes</div>
+          <div style="font-size:12px;color:var(--muted)" id="pnl-rec"></div>
+        </div>
+        <div class="pnl-blk" id="pnl-equipo" style="display:none">
+          <div style="font-size:13px;font-weight:700;margin-bottom:8px">🏆 Ranking semanal</div>
+          <div id="pnl-rank" style="font-size:13px">Cargando...</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:8px" id="pnl-meta-info"></div>
+        </div>
+      </div>
+    </div>
+    <!-- KPIs de cartera -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;padding:12px 16px 0">
+      <div class="ck-card on" id="ckc-todos" onclick="setCKpi('todos',this)" style="background:var(--card);border-color:var(--g)"><p class="ck-l" style="color:var(--muted)">Mi cartera</p><p class="ck-n" id="ck-total">—</p></div>
+      <div class="ck-card" id="ckc-atras" onclick="setCKpi('atrasados',this)" style="background:var(--rl)"><p class="ck-l" style="color:var(--r)">Atrasados</p><p class="ck-n" id="ck-atras" style="color:var(--r)">—</p></div>
+      <div class="ck-card" id="ckc-sinprox" onclick="setCKpi('sinprox',this)" style="background:var(--al)"><p class="ck-l" style="color:var(--a)">Sin próx. acción</p><p class="ck-n" id="ck-sinprox" style="color:var(--a)">—</p></div>
+      <div class="ck-card" id="ckc-hoy" onclick="setCKpi('hoy',this)" style="background:var(--gl)"><p class="ck-l" style="color:var(--g)">Para hoy</p><p class="ck-n" id="ck-hoy" style="color:var(--g)">—</p></div>
+    </div>
+    <!-- búsqueda + filtros -->
+    <div style="padding:10px 16px 4px">
       <div class="srch-w" style="margin-bottom:8px">
         <span class="srch-ico">🔍</span>
         <input type="text" id="c-srch" placeholder="Buscar por nombre o RIF..." oninput="renderCartera()" autocomplete="off">
       </div>
-      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none">
-        <button class="chip on" id="cf-todos" onclick="setCFilter('todos',this)">Todos</button>
-        <button class="chip" id="cf-prospecto" onclick="setCFilter('prospecto',this)">Prospecto</button>
-        <button class="chip" id="cf-contactado" onclick="setCFilter('contactado',this)">Contactado</button>
-        <button class="chip" id="cf-propuesta" onclick="setCFilter('propuesta',this)">Propuesta</button>
-        <button class="chip" id="cf-activo" onclick="setCFilter('cliente_activo',this)">Activo</button>
-        <span style="border-left:1px solid var(--border);margin:2px 2px"></span>
-        <button class="chip on" id="cft-todos" onclick="setCTipo('',this)">A+B+C</button>
-        <button class="chip" id="cft-A" onclick="setCTipo('A',this)">Tipo A</button>
-        <button class="chip" id="cft-B" onclick="setCTipo('B',this)">Tipo B</button>
-        <button class="chip" id="cft-C" onclick="setCTipo('C',this)">Tipo C</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <select id="cart-orden" onchange="renderCartera()" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:13px">
+          <option value="dias">Ordenar: días sin visita</option>
+          <option value="prox">Ordenar: próxima acción</option>
+          <option value="nombre">Ordenar: nombre</option>
+        </select>
+        <select id="cart-ruta" onchange="renderCartera()" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:13px">
+          <option value="">Ruta: todas</option>
+          <option>Ruta 1 · Catia</option><option>Ruta 2 · Centro</option><option>Ruta 3 · La Yaguara</option>
+          <option>Ruta 4 · Eje Sur</option><option>Ruta 5 · Eje Financiero</option><option>Ruta 6 · Boleíta Industrial</option>
+          <option>Ruta 7 · Petare / Mariche</option><option>Ruta 8 · Baruta / Hatillo</option>
+          <option>Ruta 9 · Guarenas / Guatire</option><option>Ruta 10 · Altos Mirandinos</option>
+        </select>
+        <select id="cart-tipo" onchange="renderCartera()" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:13px">
+          <option value="">Tipo: A+B+C</option><option value="A">Tipo A</option><option value="B">Tipo B</option><option value="C">Tipo C</option>
+        </select>
+        <select id="cart-etapa" onchange="renderCartera()" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:13px">
+          <option value="">Etapa: todas</option><option value="prospecto">Prospecto</option><option value="contactado">Contactado</option>
+          <option value="propuesta">Propuesta</option><option value="cliente_activo">Activo</option><option value="recompra">Recompra</option>
+        </select>
       </div>
     </div>
     <!-- client list -->
@@ -482,6 +529,19 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
           </select>
         </div>
         <button onclick="closeFicha()" style="background:var(--bg);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:var(--muted)">×</button>
+      </div>
+      <!-- contacto y acciones -->
+      <div style="padding:12px 20px;border-bottom:1px solid var(--border)">
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <button class="cart-act" style="flex:1;height:38px;font-size:13px;font-weight:600;gap:6px" onclick="fichaCall()">📞 Llamar</button>
+          <button class="cart-act" style="flex:1;height:38px;font-size:13px;font-weight:600;gap:6px" onclick="fichaWA()">💬 WhatsApp</button>
+          <button class="cart-act" id="fc-btn-map" style="flex:1;height:38px;font-size:13px;font-weight:600;gap:6px;display:none" onclick="fichaMap()">📍 Mapa</button>
+        </div>
+        <table style="width:100%;font-size:13px;color:var(--text)">
+          <tr><td style="color:var(--muted);padding:2px 0;width:38%">Contacto</td><td id="fc-ctc">—</td></tr>
+          <tr><td style="color:var(--muted);padding:2px 0">Dirección</td><td id="fc-dir">—</td></tr>
+          <tr><td style="color:var(--muted);padding:2px 0">Líneas</td><td id="fc-lineas">—</td></tr>
+        </table>
       </div>
       <!-- stats row -->
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px 20px;border-bottom:1px solid var(--border)">
@@ -1125,6 +1185,16 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .pc-unit{font-size:10px;color:var(--muted)}
 .pc-price{font-size:13px;font-weight:800;color:var(--g);white-space:nowrap}
 .pc-add{position:absolute;top:8px;right:8px}
+/* v6.2 — panel de operación + cartera tabla */
+.pnl-btn{flex:1;padding:7px 4px;font-size:12px;font-weight:600;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--muted);cursor:pointer}
+.pnl-btn.on{background:var(--gl);color:var(--g);border-color:var(--g)}
+.pnl-blk{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:8px}
+.ck-card{border-radius:10px;padding:8px 10px;cursor:pointer;border:1px solid transparent}
+.ck-card.on{border-color:var(--g)}
+.ck-l{font-size:11px;font-weight:600;margin:0}
+.ck-n{font-size:20px;font-weight:700;margin:2px 0 0}
+.cart-row{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer}
+.cart-act{background:none;border:1px solid var(--border);border-radius:8px;width:34px;height:34px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--text)}
 </style>
 <script type="module">
 // ── DISTRIGAMA v5.9 · JS modularizado (jun 2026) ──
@@ -1134,6 +1204,7 @@ import './js/utils.js';
 import './js/auth.js';
 import './js/censo.js';
 import './js/cartera.js';
+import './js/panel.js';
 import { renderCart } from './js/pdf-xlsx.js';
 import './js/reporte.js';
 import { CAT } from './data-catalog.js';
