@@ -16,7 +16,7 @@ export const app = initializeApp(FIREBASE_CONFIG);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-export const APP_VERSION = '6.1'; // ← incrementar cada deploy
+export const APP_VERSION = '6.2'; // ← incrementar cada deploy
 export const NOW = new Date();
 export const FMT_DATE = NOW.toLocaleDateString('es-VE',{day:'2-digit',month:'short',year:'numeric'});
 export const FMT_TIME = () => new Date().toLocaleTimeString('es-VE',{hour:'2-digit',minute:'2-digit'});
