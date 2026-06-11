@@ -174,7 +174,12 @@ window.savePedido = async () => {
   const after=sub-dAmt;
   const flete=after*0.035;
   const total=after+flete;
-  
+
+  // Pedido mínimo $200 (advertencia, no bloqueo)
+  if (total < 200) {
+    if (!confirm('⚠ El total del pedido es $' + total.toFixed(2) + ', por debajo del mínimo de $200.\n¿Deseas continuar de todas formas?')) return false;
+  }
+
   try {
     await addDoc(collection(db,'pedidos'), {
       cliente_nombre: cli,
