@@ -40,16 +40,26 @@ window.renderCartera = async () => {
   const el = document.getElementById('cart-list');
   if (!db || !state.currentUser) { el.innerHTML='<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px">Inicia sesión para ver tu cartera</div>'; return; }
   try {
+    const srch = (document.getElementById('c-srch')?.value||'').toLowerCase().trim();
+    const global = srch.length >= 2; // al buscar, se busca sobre TODA la base
+    const esDirector = state.userProfile?.rol==='director';
     let q = query(collection(db,'clientes'), where('vendedor_uid','==',state.currentUser.uid), orderBy('ultima_visita','desc'), limit(200));
-    if (state.userProfile?.rol==='director') q = query(collection(db,'clientes'), orderBy('ultima_visita','desc'), limit(200));
+    if (esDirector || global) q = query(collection(db,'clientes'), orderBy('ultima_visita','desc'), limit(500));
     const snap = await getDocs(q);
     let docs = snap.docs.map(d=>d.data());
+    let ajenos = [];
+    if (global && !esDirector) {
+      ajenos = docs.filter(d=>d.vendedor_uid!==state.currentUser.uid);
+      docs = docs.filter(d=>d.vendedor_uid===state.currentUser.uid);
+    }
 
-    // KPIs sobre la cartera completa
-    document.getElementById('ck-total').textContent = docs.length;
-    document.getElementById('ck-atras').textContent = docs.filter(atrasado).length;
-    document.getElementById('ck-sinprox').textContent = docs.filter(sinProx).length;
-    document.getElementById('ck-hoy').textContent = docs.filter(esHoy).length;
+    // KPIs sobre la cartera propia (no cambian durante una búsqueda)
+    if (!global) {
+      document.getElementById('ck-total').textContent = docs.length;
+      document.getElementById('ck-atras').textContent = docs.filter(atrasado).length;
+      document.getElementById('ck-sinprox').textContent = docs.filter(sinProx).length;
+      document.getElementById('ck-hoy').textContent = docs.filter(esHoy).length;
+    }
 
     // filtro por KPI
     if (cKpi === 'atrasados') docs = docs.filter(atrasado);
@@ -60,11 +70,11 @@ window.renderCartera = async () => {
     const ruta = document.getElementById('cart-ruta')?.value || '';
     const tipo = document.getElementById('cart-tipo')?.value || '';
     const etapa = document.getElementById('cart-etapa')?.value || '';
-    const srch = (document.getElementById('c-srch')?.value||'').toLowerCase();
     if (ruta) docs = docs.filter(d=>d.ruta===ruta);
     if (tipo) docs = docs.filter(d=>d.tipo===tipo);
     if (etapa) docs = docs.filter(d=>d.etapa===etapa);
-    if (srch) docs = docs.filter(d=>(d.nombre||'').toLowerCase().includes(srch)||(d.rif_formato||'').toLowerCase().includes(srch)||(d.rif_normalizado||'').toLowerCase().includes(srch));
+    const coincide = d => (d.nombre||'').toLowerCase().includes(srch)||(d.rif_formato||'').toLowerCase().includes(srch)||(d.rif_normalizado||'').toLowerCase().includes(srch);
+    if (srch) { docs = docs.filter(coincide); ajenos = ajenos.filter(coincide); }
 
     // orden
     const orden = document.getElementById('cart-orden')?.value || 'dias';
@@ -81,9 +91,17 @@ window.renderCartera = async () => {
     });
     if (orden === 'nombre') docs.sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||''));
 
-    if (!docs.length) { el.innerHTML='<div style="padding:40px 20px;text-align:center;color:var(--muted);font-size:14px"><div style="font-size:36px;margin-bottom:10px;opacity:.4">🔍</div>Sin resultados</div>'; return; }
+    const ajenosHTML = ajenos.length ? '<div style="padding:10px 16px 4px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">En cartera de otros vendedores</div>' + ajenos.map(c=>`
+      <div class="cli-ajeno">
+        <div style="font-size:14px;font-weight:700;color:var(--text)">${c.nombre||'Sin nombre'} ${c.tipo?`<span class="badge ba-${c.tipo}">${c.tipo}</span>`:''}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${c.rif_formato||c.rif_normalizado} · ${c.ruta||c.ciudad||'—'}</div>
+        <div style="font-size:12px;color:var(--a);margin-top:3px">🔒 Registrado por ${c.vendedor_nombre||'otro vendedor'} — ya está censado</div>
+      </div>`).join('') : '';
 
-    el.innerHTML = docs.map(c=>{
+    if (!docs.length && !ajenos.length) { el.innerHTML='<div style="padding:40px 20px;text-align:center;color:var(--muted);font-size:14px"><div style="font-size:36px;margin-bottom:10px;opacity:.4">🔍</div>Sin resultados en toda la base — puedes censarlo</div>'; return; }
+    if (!docs.length) { el.innerHTML = ajenosHTML; return; }
+
+    el.innerHTML = ajenosHTML + docs.map(c=>{
       const ec = ETAPA_COLOR[c.etapa]||'#F1EFE8;color:#444441';
       const [bg,txt] = ec.split(';color:');
       const d = diasSin(c);
@@ -243,6 +261,11 @@ window.saveSeguimiento = async () => {
     const upd = { ultima_visita: serverTimestamp(), total_visitas: increment(1) };
     if (obs) upd.proxima_accion = obs;
     if (proxFecha) upd.proxima_accion_fecha = proxFecha;
+    // Etapa automática (solo avanza, nunca retrocede):
+    const RANK = { prospecto:0, contactado:1, propuesta:2, cliente_activo:3, recompra:4 };
+    const META_RES = { 'Pedido cerrado':'cliente_activo', 'Proposición de pedido (en revisión)':'propuesta', 'Visita preliminar completada (fecha acordada)':'contactado' };
+    const destino = META_RES[res];
+    if (destino && (RANK[destino] > (RANK[_fichaData.etapa] ?? 0))) upd.etapa = destino;
     await updateDoc(doc(db,'clientes',_fichaRif), upd);
     fbEl('fc-seg-fb','✅ Seguimiento registrado','var(--gl)','var(--g)');
     ['fc-seg-res','fc-seg-obs','fc-seg-fecha','fc-seg-hora'].forEach(id=>document.getElementById(id).value='');
