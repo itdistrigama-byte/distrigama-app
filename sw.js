@@ -1,4 +1,4 @@
-const CACHE = 'distrigama-v7';
+const CACHE = 'distrigama-v8';
 const OFFLINE_ASSETS = ['/', '/index.html', '/manifest.json', '/data-catalog.js',
   '/js/config.js', '/js/utils.js', '/js/auth.js', '/js/censo.js',
   '/js/cartera.js', '/js/pdf-xlsx.js', '/js/reporte.js', '/js/panel.js'];
