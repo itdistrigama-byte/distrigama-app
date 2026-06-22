@@ -668,17 +668,24 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 
   <!-- PLAN DE TRABAJO -->
   <div class="scr" id="scr-plan">
-    <div class="coming-soon">
-      <div class="cs-badge">EN DESARROLLO</div>
-      <div class="cs-icon">📅</div>
-      <div class="cs-title">Plan de trabajo</div>
-      <div class="cs-sub">Planifica tu semana en base a las visitas agendadas. Abre esto el domingo y sabrás exactamente a quién visitar el lunes.</div>
-      <div class="cs-features">
-        <div>📅 Vista semanal de visitas programadas</div>
-        <div>🔔 Recordatorios automáticos por cliente</div>
-        <div>🗺️ Planificación de ruta por zona</div>
-        <div>✅ Marcar actividades completadas</div>
-        <div>📊 Resumen: pendientes vs completadas</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px 16px 0">
+      <div class="ck-card on" id="pk-todas" onclick="setPlanFiltro('todas',this)" style="background:var(--card);border-color:var(--g)"><p class="ck-l" style="color:var(--muted)">Esta semana</p><p class="ck-n" id="pk-total">—</p></div>
+      <div class="ck-card" id="pk-pend" onclick="setPlanFiltro('pendientes',this)" style="background:var(--al)"><p class="ck-l" style="color:var(--a)">Pendientes</p><p class="ck-n" id="pk-pendn" style="color:var(--a)">—</p></div>
+      <div class="ck-card" id="pk-comp" onclick="setPlanFiltro('completadas',this)" style="background:var(--gl)"><p class="ck-l" style="color:var(--g)">Completadas</p><p class="ck-n" id="pk-compn" style="color:var(--g)">—</p></div>
+    </div>
+    <div style="padding:10px 16px 4px">
+      <div class="flt"><label>Ruta</label><select id="plan-ruta" onchange="renderPlan()">
+        <option value="">Ruta: todas</option>
+        <option>Ruta 1 · Catia</option><option>Ruta 2 · Centro</option><option>Ruta 3 · La Yaguara</option>
+        <option>Ruta 4 · Eje Sur</option><option>Ruta 5 · Eje Financiero</option><option>Ruta 6 · Boleíta Industrial</option>
+        <option>Ruta 7 · Petare / Mariche</option><option>Ruta 8 · Baruta / Hatillo</option>
+        <option>Ruta 9 · Guarenas / Guatire</option><option>Ruta 10 · Altos Mirandinos</option>
+      </select></div>
+    </div>
+    <div id="plan-list" style="padding:8px 0">
+      <div style="padding:40px 20px;text-align:center;color:var(--muted);font-size:14px">
+        <div style="font-size:40px;margin-bottom:12px;opacity:.4">📅</div>
+        Cargando plan de la semana...
       </div>
     </div>
   </div>
@@ -1189,6 +1196,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .srch2 input:focus{border-color:var(--g);box-shadow:0 0 0 3px var(--gl)}
 .srch2 svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none}
 .cli-ajeno{padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg)}
+.plan-day-hdr{padding:14px 16px 6px;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
 </style>
 <script type="module">
 // ── DISTRIGAMA v5.9 · JS modularizado (jun 2026) ──
@@ -1199,6 +1207,7 @@ import './js/auth.js';
 import './js/censo.js';
 import './js/cartera.js';
 import './js/panel.js';
+import './js/plan.js';
 import { renderCart } from './js/pdf-xlsx.js';
 import './js/reporte.js';
 import { CAT } from './data-catalog.js';
