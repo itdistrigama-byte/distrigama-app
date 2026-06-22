@@ -108,6 +108,7 @@ window.sw = (tab) => {
   if (tab==='dia') window.updDia();
   if (tab==='pedido') window.renderProds();
   if (tab==='cartera') { window.renderCartera(); window.renderPanel?.(); }
+  if (tab==='plan') window.renderPlan?.();
   if (tab==='manual') document.getElementById('notif-panel').classList.remove('on');
   if (tab==='admin') window.loadAdminPanel();
 };
