@@ -140,7 +140,14 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .srch-w{position:relative;margin-bottom:10px}
 .srch-w input{padding-left:42px}
 .srch-ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:18px;pointer-events:none}
-.prod-list{max-height:300px;overflow-y:auto;border:1.5px solid var(--border);border-radius:11px;background:var(--card)}
+.prod-list{max-height:58vh;min-height:300px;overflow-y:auto;-webkit-overflow-scrolling:touch;border:1.5px solid var(--border);border-radius:11px;background:var(--card)}
+.cat-meta{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin:-4px 2px 8px}
+.cat-meta b{color:var(--text);font-weight:700}
+.cat-end{padding:14px 10px 20px;text-align:center;font-size:11.5px;color:var(--muted)}
+.ped-restore{display:none;align-items:flex-start;gap:10px;background:#FFF8E6;border:1.5px solid #F0C36D;border-radius:11px;padding:11px 13px;margin-bottom:12px;font-size:12.5px;line-height:1.45;color:#6B4E00}
+.ped-restore.on{display:flex}
+.ped-restore b{display:block;font-size:13px;margin-bottom:2px}
+.ped-restore button{background:none;border:none;color:#6B4E00;text-decoration:underline;font-size:12px;cursor:pointer;padding:0;margin-top:5px;font-family:inherit}
 .prod-row{display:flex;align-items:center;padding:11px 13px;border-bottom:1px solid var(--border);gap:10px;cursor:pointer;transition:background .1s}
 .prod-row:last-child{border-bottom:none}
 .prod-row:hover,.prod-row.in{background:var(--gl)}
@@ -223,7 +230,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 @media(min-width:768px){
   .tablet-split{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
   .scr{padding:20px 24px}
-  .prod-list{max-height:440px}
+  .prod-list{max-height:66vh;min-height:420px}
 }
 </style>
 </head>
@@ -586,6 +593,14 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 
   <!-- PEDIDO -->
   <div class="scr" id="scr-pedido">
+    <div class="ped-restore" id="ped-restore">
+      <span style="font-size:17px;line-height:1">↩️</span>
+      <div style="flex:1">
+        <b>Recuperamos tu pedido en curso</b>
+        <span id="ped-restore-txt"></span>
+        <button onclick="descartarPedido()">Descartar y empezar de cero</button>
+      </div>
+    </div>
     <div class="tablet-split">
       <div>
         <div class="card">
@@ -621,23 +636,27 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
         <div class="sec-t">Catálogo</div>
         <div class="chips" id="chips">
           <div class="chip on" onclick="fCat('',this)">Todos</div>
-          <div class="chip" onclick="fCat('ELECTRICIDAD',this)">Electricidad</div>
           <div class="chip" onclick="fCat('PLOMERIA',this)">Plomería</div>
-          <div class="chip" onclick="fCat('BOMBAS',this)">Bombas</div>
-          <div class="chip" onclick="fCat('TIRRAP',this)">Tirrap</div>
+          <div class="chip" onclick="fCat('ELECTRICIDAD',this)">Electricidad</div>
+          <div class="chip" onclick="fCat('FERRETERIA',this)">Ferretería</div>
+          <div class="chip" onclick="fCat('CANDADOS',this)">Candados</div>
           <div class="chip" onclick="fCat('GRIFERIAS',this)">Griferías</div>
           <div class="chip" onclick="fCat('ABRAZADERA',this)">Abrazadera</div>
-          <div class="chip" onclick="fCat('FERRETERIA',this)">Ferretería</div>
+          <div class="chip" onclick="fCat('BOMBAS',this)">Bombas</div>
           <div class="chip" onclick="fCat('MECHA',this)">Mechas</div>
           <div class="chip" onclick="fCat('DISCO',this)">Discos</div>
-          <div class="chip" onclick="fCat('CANDADOS',this)">Candados</div>
           <div class="chip" onclick="fCat('HERRAMIENTAS',this)">Herramientas</div>
-          <div class="chip" onclick="fCat('BOMBILLOS',this)">Bombillos</div>
+          <div class="chip" onclick="fCat('TIRRAP',this)">Tirrap</div>
           <div class="chip" onclick="fCat('ILUMINACION',this)">Iluminación</div>
+          <div class="chip" onclick="fCat('BOMBILLOS',this)">Bombillos</div>
         </div>
         <div class="srch-w">
           <span class="srch-ico">🔍</span>
           <input type="text" id="p-srch" placeholder="Buscar código o nombre..." oninput="renderProds()" autocomplete="off">
+        </div>
+        <div class="cat-meta">
+          <span id="p-count">Cargando catálogo…</span>
+          <span id="p-fecha"></span>
         </div>
         <div class="prod-list" id="p-list">
           <div id="p-skeleton">
@@ -647,6 +666,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
             <div class="skeleton-row"><div class="skeleton-box" style="width:52px;height:14px;flex-shrink:0"></div><div style="flex:1;display:flex;flex-direction:column;gap:6px"><div class="skeleton-box" style="height:13px;width:65%"></div><div class="skeleton-box" style="height:11px;width:55%"></div></div><div class="skeleton-box" style="width:36px;height:14px"></div></div>
             <div class="skeleton-row"><div class="skeleton-box" style="width:52px;height:14px;flex-shrink:0"></div><div style="flex:1;display:flex;flex-direction:column;gap:6px"><div class="skeleton-box" style="height:13px;width:85%"></div><div class="skeleton-box" style="height:11px;width:35%"></div></div><div class="skeleton-box" style="width:36px;height:14px"></div></div>
           </div>
+          <div class="prod-grid" id="p-grid"></div>
+          <div class="cat-end" id="p-end"></div>
         </div>
       </div>
       <div>
@@ -1176,6 +1197,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .pc-unit{font-size:10px;color:var(--muted)}
 .pc-price{font-size:13px;font-weight:800;color:var(--g);white-space:nowrap}
 .pc-add{position:absolute;top:8px;right:8px}
+.pc-img.pc-noimg{visibility:hidden}
+.pc-code{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.pc-low{background:#FFF1DC;color:#9A5B00;border-radius:5px;padding:1px 5px;font-size:9.5px;font-weight:700;letter-spacing:.2px}
 /* v6.2 — panel de operación + cartera tabla */
 .pnl-btn{flex:1;padding:7px 4px;font-size:12px;font-weight:600;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--muted);cursor:pointer}
 .pnl-btn.on{background:var(--gl);color:var(--g);border-color:var(--g)}
@@ -1210,13 +1234,41 @@ import './js/panel.js';
 import './js/plan.js';
 import { renderCart } from './js/pdf-xlsx.js';
 import './js/reporte.js';
-import { CAT } from './data-catalog.js';
+import { CAT, CAT_FECHA } from './data-catalog.js';
 
-// ── PEDIDO ──
+// ══════════════════════════════════════════════════════════════════════════
+//  PEDIDO  ·  v6.5 (ago 2026)
+//  · Catálogo completo navegable: se acabó el corte de 80 productos.
+//    Se pinta por tandas de 60 conforme el vendedor baja (scroll infinito),
+//    así el teléfono no arma 660 tarjetas de golpe.
+//  · Solo se ofrece lo que hay: los productos con existencia 0 no se muestran.
+//  · El pedido en curso sobrevive al botón atrás, a recargar y a cerrar la app.
+// ══════════════════════════════════════════════════════════════════════════
+
+const LOTE = 60;                                  // tarjetas por tanda
+const DISPONIBLES = CAT.filter(p => p.e > 0);     // regla de negocio: no se impulsa lo agotado
+const POR_CODIGO = new Map(DISPONIBLES.map(p => [p.c, p]));
+
+let _lista = DISPONIBLES;   // resultado del filtro actual
+let _pintados = 0;          // cuántas tarjetas ya están en el DOM
+let _obs = null;            // observador del scroll infinito
+
+const IMG = c => 'img/' + c.replace(/[\/\s]/g,'_') + '.jpg';
+const esc = s => String(s ?? '').replace(/[&<>"']/g, m =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);
+
+const FECHA_CAT = (() => {
+  const [a,m,d] = String(CAT_FECHA||'').split('-').map(Number);
+  return (a && m && d)
+    ? new Date(a, m-1, d).toLocaleDateString('es-VE',{day:'numeric',month:'short',year:'numeric'})
+    : (CAT_FECHA || '');
+})();
+
 window.setMon = (m, el) => {
   state.moneda = m;
   document.getElementById('m-usd').classList.toggle('on', m==='USD');
   document.getElementById('m-bcv').classList.toggle('on', m==='BCV');
+  guardarPedido();
 };
 
 window.fCat = (cat, el) => {
@@ -1226,44 +1278,223 @@ window.fCat = (cat, el) => {
   renderProds();
 };
 
-const IMG = c => 'img/' + c.replace(/[\/\s]/g,'_') + '.jpg';
+// ── Pintado del catálogo ──────────────────────────────────────────────────
+function tarjeta(p, enCarrito){
+  const codigo = esc(p.c);
+  const bajo = p.e <= 3 ? `<span class="pc-low">Quedan ${p.e}</span>` : '';
+  return `<div class="prod-card${enCarrito ? ' in' : ''}" data-c="${codigo}">
+    <img class="pc-img" src="${IMG(p.c)}" alt="" loading="lazy" onerror="this.classList.add('pc-noimg')">
+    <div class="pc-code"><span>${codigo}</span>${bajo}</div>
+    <div class="pc-name">${esc(p.n)}</div>
+    <div class="pc-foot"><span class="pc-unit">${esc(p.u)}</span><span class="pc-price">$${p.p.toFixed(2)}</span></div>
+    <button class="p-add pc-add" data-c="${codigo}" aria-label="Agregar ${codigo}">+</button>
+  </div>`;
+}
+
+function pieCatalogo(){
+  const cont = document.getElementById('p-count');
+  const fech = document.getElementById('p-fecha');
+  const fin  = document.getElementById('p-end');
+  if (cont) cont.innerHTML = _lista.length
+    ? `Mostrando <b>${Math.min(_pintados, _lista.length)}</b> de <b>${_lista.length}</b> productos`
+    : 'Sin resultados';
+  if (fech) fech.textContent = FECHA_CAT ? `Catálogo actualizado ${FECHA_CAT}` : '';
+  if (fin)  fin.textContent = !_lista.length ? ''
+    : (_pintados >= _lista.length
+        ? (_lista.length > LOTE ? 'Fin del catálogo' : '')
+        : 'Baja para ver más…');
+}
+
+function pintarLote(){
+  const grid = document.getElementById('p-grid');
+  if (!grid || _pintados >= _lista.length) { pieCatalogo(); return false; }
+  const enCarrito = new Set(state.cart.map(x => x.c));
+  const trozo = _lista.slice(_pintados, _pintados + LOTE);
+  grid.insertAdjacentHTML('beforeend', trozo.map(p => tarjeta(p, enCarrito.has(p.c))).join(''));
+  _pintados += trozo.length;
+  pieCatalogo();
+  return true;
+}
+
+// Si la primera tanda no llena la pantalla, el observador nunca se dispararía.
+function rellenarSiSobraEspacio(){
+  const cont = document.getElementById('p-list');
+  if (!cont) return;
+  let vueltas = 0;
+  while (_pintados < _lista.length && cont.scrollHeight <= cont.clientHeight + 120 && vueltas++ < 25) {
+    if (!pintarLote()) break;
+  }
+}
+
 window.renderProds = () => {
   const skel = document.getElementById('p-skeleton');
   if (skel) skel.remove();
-  const srch = (document.getElementById('p-srch')?.value||'').toLowerCase();
-  let list = CAT;
-  if (state.catFilter) list = list.filter(p => p.g.includes(state.catFilter));
-  if (srch) list = list.filter(p => p.c.toLowerCase().includes(srch)||p.n.toLowerCase().includes(srch));
-  const inCart = new Set(state.cart.map(x=>x.c));
-  const el = document.getElementById('p-list');
-  if (!list.length) { el.innerHTML='<div style="padding:18px;text-align:center;color:var(--muted)">Sin resultados</div>'; return; }
-  el.innerHTML = '<div class="prod-grid">' + list.slice(0,80).map(p => `
-    <div class="prod-card ${inCart.has(p.c)?'in':''}" onclick="addCart('${p.c}')">
-      <img class="pc-img" src="${IMG(p.c)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">
-      <div class="pc-code">${p.c}</div>
-      <div class="pc-name">${p.n}</div>
-      <div class="pc-foot"><span class="pc-unit">${p.u}</span><span class="pc-price">$${p.p.toFixed(2)}</span></div>
-      <button class="p-add pc-add" onclick="event.stopPropagation();addCart('${p.c}')">+</button>
-    </div>`).join('') + '</div>';
+  const grid = document.getElementById('p-grid');
+  const cont = document.getElementById('p-list');
+  if (!grid || !cont) return;
+
+  const srch = (document.getElementById('p-srch')?.value || '').trim().toLowerCase();
+  let lista = DISPONIBLES;
+  if (state.catFilter) lista = lista.filter(p => p.g === state.catFilter);
+  if (srch) {
+    const t = srch.split(/\s+/);
+    lista = lista.filter(p => {
+      const heno = (p.c + ' ' + p.n).toLowerCase();
+      return t.every(x => heno.includes(x));
+    });
+  }
+
+  _lista = lista;
+  _pintados = 0;
+  grid.innerHTML = '';
+  cont.scrollTop = 0;
+  pintarLote();
+  rellenarSiSobraEspacio();
+
+  if (!_obs) {
+    _obs = new IntersectionObserver(entradas => {
+      if (entradas.some(e => e.isIntersecting)) pintarLote();
+    }, { root: cont, rootMargin: '500px 0px' });
+    const fin = document.getElementById('p-end');
+    if (fin) _obs.observe(fin);
+  }
 };
 
+// Un solo manejador para todo el catálogo, en vez de 660 atributos onclick.
+document.getElementById('p-list')?.addEventListener('click', ev => {
+  const destino = ev.target.closest('[data-c]');
+  if (!destino) return;
+  ev.stopPropagation();
+  addCart(destino.dataset.c);
+});
+
+// ── Carrito ───────────────────────────────────────────────────────────────
+function marcarTarjeta(code){
+  const enCarrito = state.cart.some(x => x.c === code);
+  document.querySelectorAll(`.prod-card[data-c="${CSS.escape(code)}"]`)
+    .forEach(t => t.classList.toggle('in', enCarrito));
+}
+
 window.addCart = (code) => {
-  const p = CAT.find(x=>x.c===code); if(!p) return;
-  const ex = state.cart.find(x=>x.c===code);
-  if(ex) ex.qty++; else state.cart.push({...p,qty:1});
-  // pulse animation on the + button
-  const btn = document.querySelector(`.p-add[onclick*="'${code}'"]`);
-  if (btn) { btn.classList.add('pulse-add'); setTimeout(()=>btn.classList.remove('pulse-add'),300); }
-  renderCart(); renderProds();
+  const p = POR_CODIGO.get(code);
+  if (!p) { alert('Ese producto ya no está disponible en el catálogo.'); return; }
+  const ex = state.cart.find(x => x.c === code);
+  if (ex) ex.qty++; else state.cart.push({ ...p, qty: 1 });
+  const btn = document.querySelector(`.p-add[data-c="${CSS.escape(code)}"]`);
+  if (btn) { btn.classList.add('pulse-add'); setTimeout(()=>btn.classList.remove('pulse-add'), 300); }
+  marcarTarjeta(code);
+  renderCart(); guardarPedido();
 };
-window.rmCart = (code) => { state.cart=state.cart.filter(x=>x.c!==code); renderCart(); renderProds(); };
-window.updQty = (code,v) => { const i=state.cart.find(x=>x.c===code); if(!i)return; i.qty=Math.max(1,parseInt(v)||1); renderCart(); };
-window.clearCart = () => { state.cart=[]; renderCart(); renderProds(); };
+window.rmCart = (code) => {
+  state.cart = state.cart.filter(x => x.c !== code);
+  marcarTarjeta(code); renderCart(); guardarPedido();
+};
+window.updQty = (code, v) => {
+  const i = state.cart.find(x => x.c === code); if (!i) return;
+  i.qty = Math.max(1, parseInt(v) || 1);
+  renderCart(); guardarPedido();
+};
+window.clearCart = () => {
+  const codigos = state.cart.map(x => x.c);
+  state.cart = [];
+  codigos.forEach(marcarTarjeta);
+  renderCart(); guardarPedido();
+};
 window.setDisc = (d, el) => {
   state.disc = d;
   ['d0','d35','d40'].forEach(id => document.getElementById(id).classList.remove('on'));
-  el.classList.add('on'); renderCart();
+  el.classList.add('on'); renderCart(); guardarPedido();
 };
+
+// ══════════════════════════════════════════════════════════════════════════
+//  Memoria del pedido en curso
+//  Antes, el botón atrás del teléfono borraba el carrito. Ahora el pedido
+//  completo — productos, datos del cliente, descuento y moneda — se guarda
+//  en el propio teléfono y se recupera al volver.
+// ══════════════════════════════════════════════════════════════════════════
+const PED_KEY = 'dg_pedido_v1';
+const PED_HORAS_VIDA = 72;
+const CAMPOS = ['p-cli','p-tel','p-rif','p-dir','p-vend','p-cred'];
+
+function leerCampos(){
+  const o = {};
+  CAMPOS.forEach(id => { const el = document.getElementById(id); if (el) o[id] = el.value; });
+  return o;
+}
+
+window.guardarPedido = () => {
+  try {
+    const datos = leerCampos();
+    const vacio = !state.cart.length && !Object.values(datos).some(v => v && v !== 'Contado');
+    if (vacio) { localStorage.removeItem(PED_KEY); return; }
+    localStorage.setItem(PED_KEY, JSON.stringify({
+      v: 1, ts: Date.now(), cart: state.cart,
+      disc: state.disc, moneda: state.moneda, datos
+    }));
+  } catch (e) { console.warn('No se pudo guardar el pedido en curso:', e); }
+};
+
+window.descartarPedido = () => {
+  localStorage.removeItem(PED_KEY);
+  state.cart = []; state.disc = 35; state.moneda = 'USD';
+  CAMPOS.forEach(id => { const el = document.getElementById(id); if (el) el.value = id === 'p-cred' ? 'Contado' : ''; });
+  document.getElementById('ped-restore')?.classList.remove('on');
+  renderCart(); renderProds();
+};
+
+function restaurarPedido(){
+  let g;
+  try { g = JSON.parse(localStorage.getItem(PED_KEY) || 'null'); } catch { return; }
+  if (!g || g.v !== 1) return;
+  if ((Date.now() - g.ts) / 3600000 > PED_HORAS_VIDA) { localStorage.removeItem(PED_KEY); return; }
+
+  // El catálogo pudo cambiar mientras el pedido estaba guardado.
+  const recuperados = [], reprecio = [], perdidos = [];
+  for (const it of (g.cart || [])) {
+    const actual = POR_CODIGO.get(it.c);
+    if (!actual) { perdidos.push(it.c); continue; }
+    if (Math.abs(actual.p - it.p) > 0.005) reprecio.push(it.c);
+    recuperados.push({ ...actual, qty: Math.max(1, parseInt(it.qty) || 1) });
+  }
+
+  state.cart = recuperados;
+  if (typeof g.disc === 'number') state.disc = g.disc;
+  if (g.moneda) state.moneda = g.moneda;
+  Object.entries(g.datos || {}).forEach(([id, val]) => {
+    const el = document.getElementById(id); if (el && val) el.value = val;
+  });
+  document.getElementById('m-usd')?.classList.toggle('on', state.moneda === 'USD');
+  document.getElementById('m-bcv')?.classList.toggle('on', state.moneda === 'BCV');
+  ['d0','d35','d40'].forEach(id => document.getElementById(id)?.classList.remove('on'));
+  document.getElementById({0:'d0',35:'d35',40:'d40'}[state.disc])?.classList.add('on');
+
+  if (!recuperados.length && !Object.values(g.datos||{}).some(v => v && v !== 'Contado')) {
+    localStorage.removeItem(PED_KEY); return;
+  }
+
+  const partes = [];
+  if (recuperados.length) partes.push(`${recuperados.length} producto${recuperados.length!==1?'s':''} en el carrito`);
+  if (reprecio.length)    partes.push(`${reprecio.length} cambió de precio`.replace('cambió', reprecio.length!==1?'cambiaron':'cambió'));
+  if (perdidos.length)    partes.push(`${perdidos.length} ya no está disponible`.replace('está', perdidos.length!==1?'están':'está'));
+  const caja = document.getElementById('ped-restore');
+  const txt  = document.getElementById('ped-restore-txt');
+  if (caja && txt) { txt.textContent = partes.join(' · ') + '.'; caja.classList.add('on'); }
+
+  renderCart();
+  guardarPedido();
+}
+
+// Guardar también al escribir los datos del cliente y al salir de la app.
+let _t = null;
+CAMPOS.forEach(id => {
+  const el = document.getElementById(id);
+  el?.addEventListener('input',  () => { clearTimeout(_t); _t = setTimeout(guardarPedido, 400); });
+  el?.addEventListener('change', guardarPedido);
+});
+window.addEventListener('pagehide', guardarPedido);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') guardarPedido(); });
+
+restaurarPedido();
 </script>
 </body>
 </html>
