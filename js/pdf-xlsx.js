@@ -5,6 +5,21 @@ import { doc, getDoc, setDoc, addDoc, updateDoc, collection, serverTimestamp }
 
 function isCpvAf(code){ return /^CPV-AF\d+$/.test(code); }
 
+// v6.5 — Cierra el pedido después de emitirlo: vacía el carrito, deja el
+// descuento en 0 y borra la copia guardada en el teléfono. Antes solo se
+// limpiaba el estado interno y el panel del carrito quedaba mostrando
+// productos que ya no existían.
+function limpiarPedido(){
+  state.cart.length = 0;
+  state.disc = 0;
+  ['d0','d35','d40'].forEach(id => document.getElementById(id)?.classList.remove('on'));
+  document.getElementById('d0')?.classList.add('on');
+  try { localStorage.removeItem('dg_pedido_v1'); } catch(e){}
+  document.getElementById('ped-restore')?.classList.remove('on');
+  renderCart();
+  if (typeof window.renderProds === 'function') window.renderProds();
+}
+
 export function renderCart() {
   const empty = document.getElementById('cart-empty');
   const card = document.getElementById('cart-card');
@@ -434,8 +449,7 @@ window.dlPDF = async () => {
           text: `Pedido de ${cli} — $${total.toFixed(3)} ${state.moneda}`,
           files: [pdfFile]
         });
-        state.cart.length = 0; state.disc = 0;
-        renderProds();
+        limpiarPedido();
         return;
       }
     } catch(e) {
@@ -445,8 +459,7 @@ window.dlPDF = async () => {
   
   // Fallback: descarga directa
   pdf.save(filename);
-  state.cart.length = 0; state.disc = 0;
-  renderProds();
+  limpiarPedido();
   alert('✅ Pedido guardado y PDF descargado');
 };
 
